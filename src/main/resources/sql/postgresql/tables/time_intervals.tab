@@ -1,0 +1,10 @@
+CREATE TABLE time_intervals (
+    ID                   numeric(16) DEFAULT nextval('serial') NOT NULL,
+    CODE                 varchar(50) NOT NULL,
+    DESCRIPTION          varchar(1024),
+    INTERVAL_MS          numeric(36) NOT NULL,
+    LAST_ACTIVITY_DT_TM  Date DEFAULT CURRENT_TIMESTAMP,
+    ACTIVITY             varchar(1) DEFAULT 'A',
+
+    CONSTRAINT tm_int_ID_pk PRIMARY KEY(ID)
+);

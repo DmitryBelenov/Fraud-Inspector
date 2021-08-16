@@ -1,0 +1,13 @@
+CREATE TABLE time_monitors (
+    ID                   numeric(16) DEFAULT nextval('serial') NOT NULL,
+    CODE                 varchar(50) NOT NULL,
+    DESCRIPTION          varchar(1024),
+    INTERVAL_ID          numeric(16) NOT NULL,
+    COLLECTOR_ID         numeric(16) NOT NULL,
+    LAST_ACTIVITY_DT_TM  Date DEFAULT CURRENT_TIMESTAMP,
+    ACTIVITY             varchar(1) DEFAULT 'A',
+
+    CONSTRAINT tm_mon_ID_pk PRIMARY KEY(ID),
+    CONSTRAINT tm_mon_stat_collector_fk FOREIGN KEY(COLLECTOR_ID) REFERENCES stat_collectors(ID) ON DELETE SET NULL,
+    CONSTRAINT tm_mon_tm_interval_fk FOREIGN KEY(INTERVAL_ID) REFERENCES time_intervals(ID) ON DELETE SET NULL
+);

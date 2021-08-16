@@ -1,0 +1,10 @@
+CREATE TABLE stat_collectors (
+    ID                   numeric(16) DEFAULT nextval('serial') NOT NULL,
+    CODE                 varchar(50) NOT NULL,
+    GROUP_BY             varchar(1024),
+    FILTER               varchar(1024),
+    LAST_ACTIVITY_DT_TM  Date DEFAULT CURRENT_TIMESTAMP,
+    ACTIVITY             varchar(1) DEFAULT 'A',
+
+    CONSTRAINT stat_coll_ID_pk PRIMARY KEY(ID)
+);
