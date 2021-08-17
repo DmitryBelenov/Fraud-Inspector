@@ -4,10 +4,11 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import sys.FIParams;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Properties;
 
 public class DBConnectionHolder {
-    public static final Logger log = LogManager.getLogger(DBConnectionHolder.class);
+    public static final Logger log = LogManager.getLogger(MethodHandles.lookup().lookupClass());
 
     private static DBConnectionHolder dbCHolder;
     private final DBSource dbSource;

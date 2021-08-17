@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import sys.cache.CacheUnit;
 import sys.cache.DBCache;
 
+import java.lang.invoke.MethodHandles;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,7 +15,7 @@ import java.util.Iterator;
 import java.util.stream.Stream;
 
 public class StatCollector implements CacheUnit {
-    public static final Logger log = LogManager.getLogger(StatCollector.class);
+    public static final Logger log = LogManager.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final DCStatCollector DC_STAT_COLLECTOR = new DCStatCollector();
 
@@ -147,7 +148,7 @@ public class StatCollector implements CacheUnit {
                                 rs.getString(3),                    // GROUP_BY
                                 rs.getString(4),                    // FILTER
                                 rs.getDate(5),                      // LAST_ACTIVITY_DT_TM
-                                Activity.valueOf(rs.getString(6))   // CODE
+                                Activity.valueOf(rs.getString(6))   // ACTIVITY
                         );
 
                         addByKey(id, sc);

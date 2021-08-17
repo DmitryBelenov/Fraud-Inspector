@@ -9,19 +9,19 @@ public interface IStatistic {
 
     BigDecimal getAverageRejectedValue();
 
-    BigDecimal getTotalApprovedCount();
+    long getTotalApprovedCount();
 
     BigDecimal getTotalApprovedValue();
 
-    BigDecimal getTotalRejectedCount();
+    long getTotalRejectedCount();
 
     BigDecimal getTotalRejectedValue();
 
-    BigDecimal getFreqApprovedCount();
+    long getFreqApprovedCount();
 
     BigDecimal getFreqApprovedValue();
 
-    BigDecimal getFreqRejectedCount();
+    long getFreqRejectedCount();
 
     BigDecimal getFreqRejectedValue();
 
@@ -31,13 +31,13 @@ public interface IStatistic {
 
         static IStatistic of(final BigDecimal averageApprovedValue,
                              final BigDecimal averageRejectedValue,
-                             final BigDecimal totalApprovedCount,
+                             final long totalApprovedCount,
                              final BigDecimal totalApprovedValue,
-                             final BigDecimal totalRejectedCount,
+                             final long totalRejectedCount,
                              final BigDecimal totalRejectedValue,
-                             final BigDecimal freqApprovedCount,
+                             final long freqApprovedCount,
                              final BigDecimal freqApprovedValue,
-                             final BigDecimal freqRejectedCount,
+                             final long freqRejectedCount,
                              final BigDecimal freqRejectedValue,
                              final Date lastApprovedDate,
                              final Date lastRejectedDate) {
@@ -53,7 +53,7 @@ public interface IStatistic {
                 }
 
                 @Override
-                public BigDecimal getTotalApprovedCount() {
+                public long getTotalApprovedCount() {
                     return totalApprovedCount;
                 }
 
@@ -63,7 +63,7 @@ public interface IStatistic {
                 }
 
                 @Override
-                public BigDecimal getTotalRejectedCount() {
+                public long getTotalRejectedCount() {
                     return totalRejectedCount;
                 }
 
@@ -73,7 +73,7 @@ public interface IStatistic {
                 }
 
                 @Override
-                public BigDecimal getFreqApprovedCount() {
+                public long getFreqApprovedCount() {
                     return freqApprovedCount;
                 }
 
@@ -83,7 +83,7 @@ public interface IStatistic {
                 }
 
                 @Override
-                public BigDecimal getFreqRejectedCount() {
+                public long getFreqRejectedCount() {
                     return freqRejectedCount;
                 }
 
@@ -105,15 +105,15 @@ public interface IStatistic {
                 @Override
                 public String toString() {
                     return "[" +
-                            "ttlAppCnt="   + getTotalApprovedCount().intValue()   +
+                            "ttlAppCnt="   + getTotalApprovedCount()   +
                             ",ttlAppVal="  + getTotalApprovedValue().intValue()   +
-                            ",ttlRejCnt="  + getTotalRejectedCount().intValue()  +
+                            ",ttlRejCnt="  + getTotalRejectedCount()  +
                             ",ttlRejVal="  + getTotalRejectedValue().intValue()   +
                             ",avgAppVal="  + getAverageApprovedValue().doubleValue() +
                             ",avgRejVal="  + getAverageRejectedValue().doubleValue() +
-                            ",freqAppCnt=" + getFreqApprovedCount().doubleValue()    +
+                            ",freqAppCnt=" + getFreqApprovedCount()    +
                             ",freqAppVal=" + getFreqApprovedValue().doubleValue()    +
-                            ",freqRejCnt=" + getFreqRejectedCount().doubleValue()    +
+                            ",freqRejCnt=" + getFreqRejectedCount()    +
                             ",freqRejVal=" + getFreqRejectedValue().doubleValue()    +
                             ",lastAppDt="  + getLastApprovedDate()     +
                             ",lastRejDt="  + getLastRejectedDate()     +

@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import sys.cache.CacheUnit;
 import sys.cache.DBCache;
 
+import java.lang.invoke.MethodHandles;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,7 +15,7 @@ import java.util.Iterator;
 import java.util.stream.Stream;
 
 public class TimeMonitor implements CacheUnit {
-    public static final Logger log = LogManager.getLogger(TimeMonitor.class);
+    public static final Logger log = LogManager.getLogger(MethodHandles.lookup().lookupClass());
     private static final DCTMonitor DC_T_MONITOR = new DCTMonitor();
 
     private static final String TABLE_NAME = "time_monitors";
@@ -161,7 +162,7 @@ public class TimeMonitor implements CacheUnit {
                                 ti,                                                // time interval
                                 sc,                                                // stat collector
                                 rs.getDate(6),                          // LAST_ACTIVITY_DT_TM
-                                Activity.valueOf(rs.getString(7))       // CODE
+                                Activity.valueOf(rs.getString(7))       // ACTIVITY
                         );
 
                         addByKey(id, tm);

@@ -7,10 +7,11 @@ import sys.FISystem;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import java.lang.invoke.MethodHandles;
 
 @WebListener
 public class CtxListener implements ServletContextListener {
-    public static final Logger log = LogManager.getLogger(CtxListener.class);
+    public static final Logger log = LogManager.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {

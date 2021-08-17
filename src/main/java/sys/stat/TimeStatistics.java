@@ -24,25 +24,25 @@ public class TimeStatistics implements Serializable {
     private BigDecimal avgRejVal;
 
     @SerializedName("ttl_app_cnt")
-    private BigDecimal ttlAppCnt;
+    private long ttlAppCnt;
 
     @SerializedName("ttl_app_val")
     private BigDecimal ttlAppVal;
 
     @SerializedName("ttl_rej_cnt")
-    private BigDecimal ttlRejCnt;
+    private long ttlRejCnt;
 
     @SerializedName("ttl_rej_val")
     private BigDecimal ttlRejVal;
 
     @SerializedName("fr_app_cnt")
-    private BigDecimal freqAppCnt;
+    private long freqAppCnt;
 
     @SerializedName("fr_app_val")
     private BigDecimal freqAppVal;
 
     @SerializedName("fr_rej_cnt")
-    private BigDecimal freqRejCnt;
+    private long freqRejCnt;
 
     @SerializedName("fr_rej_val")
     private BigDecimal freqRejVal;
@@ -53,8 +53,7 @@ public class TimeStatistics implements Serializable {
     @SerializedName("ls_rej_dt")
     private Date lsRejDt;
 
-    private final transient BigDecimal intervalSec;
-    private static final transient BigDecimal ONE_CNT = new BigDecimal(1);
+    private final transient long intervalSec;
 
     private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
     private final Lock rLock = rwLock.readLock();
@@ -63,19 +62,19 @@ public class TimeStatistics implements Serializable {
     public TimeStatistics(final String monCode, final TimeInterval interval) {
         this.monCode = monCode;
 
-        this.ttlAppCnt = new BigDecimal(0);
-        this.ttlRejCnt = new BigDecimal(0);
+        this.ttlAppCnt = 0;
+        this.ttlRejCnt = 0;
 
-        this.ttlAppVal = new BigDecimal(0);
-        this.ttlRejVal = new BigDecimal(0);
+        this.ttlAppVal = new BigDecimal(0).setScale(3, RoundingMode.HALF_UP);
+        this.ttlRejVal = new BigDecimal(0).setScale(3, RoundingMode.HALF_UP);
 
-        this.avgAppVal = new BigDecimal(0);
-        this.avgRejVal = new BigDecimal(0);
+        this.avgAppVal = new BigDecimal(0).setScale(3, RoundingMode.HALF_UP);
+        this.avgRejVal = new BigDecimal(0).setScale(3, RoundingMode.HALF_UP);
 
         this.lsAppDt = null;
         this.lsRejDt = null;
 
-        this.intervalSec = new BigDecimal(interval.getIntervalMs() / 1000);
+        this.intervalSec = interval.getIntervalMs() / 1000;
     }
 
     public IStatistic get() {
@@ -90,11 +89,11 @@ public class TimeStatistics implements Serializable {
     public void recalculateApproved(final BigDecimal amount, final boolean increment, final Date transDate) {
         wLock.lock();
         try {
-            ttlAppCnt = increment ? (ttlAppCnt = ttlAppCnt.add(ONE_CNT)) : (ttlAppCnt = ttlAppCnt.subtract(ONE_CNT));
+            ttlAppCnt = increment ? ttlAppCnt++ : ttlAppCnt--;
             ttlAppVal = increment ? (ttlAppVal = ttlAppVal.add(amount)) : (ttlAppVal = ttlAppVal.subtract(amount));
-            avgAppVal = ttlAppCnt.intValue() == 0 ? new BigDecimal(0) : (ttlAppVal = ttlAppVal.divide(ttlAppCnt, RoundingMode.UP));
-            freqAppCnt = ttlAppCnt.divide(intervalSec, RoundingMode.HALF_UP);
-            freqAppVal = ttlAppVal.divide(intervalSec, RoundingMode.UP);
+            avgAppVal = ttlAppCnt == 0 ? BigDecimal.ZERO : (avgAppVal = ttlAppVal.divide(BigDecimal.valueOf(ttlAppCnt), RoundingMode.HALF_UP));
+            freqAppCnt = ttlAppCnt / intervalSec;
+            freqAppVal = ttlAppVal.divide(BigDecimal.valueOf(intervalSec), RoundingMode.HALF_UP);
             lsAppDt = getMaxDateValue(lsAppDt, transDate);
         } finally {
             wLock.unlock();
@@ -104,11 +103,11 @@ public class TimeStatistics implements Serializable {
     public void recalculateRejected(final BigDecimal amount, final boolean increment, final Date transDate) {
         wLock.lock();
         try {
-            ttlRejCnt = increment ? (ttlRejCnt = ttlRejCnt.add(ONE_CNT)) : (ttlRejCnt = ttlRejCnt.subtract(ONE_CNT));
+            ttlRejCnt = increment ? ttlRejCnt++ : ttlRejCnt--;
             ttlRejVal = increment ? (ttlRejVal = ttlRejVal.add(amount)) : (ttlRejVal = ttlRejVal.subtract(amount));
-            avgRejVal = ttlRejCnt.intValue() == 0 ? new BigDecimal(0) : ttlRejVal.divide(ttlRejCnt, RoundingMode.UP);
-            freqRejCnt = ttlRejCnt.divide(intervalSec, RoundingMode.HALF_UP);
-            freqRejVal = ttlRejVal.divide(intervalSec, RoundingMode.UP);
+            avgRejVal = ttlRejCnt == 0 ? BigDecimal.ZERO : avgRejVal.divide(BigDecimal.valueOf(ttlRejCnt), RoundingMode.HALF_UP);
+            freqRejCnt = ttlRejCnt / intervalSec;
+            freqRejVal = ttlRejVal.divide(BigDecimal.valueOf(intervalSec), RoundingMode.HALF_UP);
             lsRejDt = getMaxDateValue(lsRejDt, transDate);
         } finally {
             wLock.unlock();
@@ -137,6 +136,6 @@ public class TimeStatistics implements Serializable {
     }
 
     public boolean isZeroStat() {
-        return ttlAppCnt.intValue() == 0 && ttlRejCnt.intValue() == 0;
+        return ttlAppCnt == 0 && ttlRejCnt == 0;
     }
 }

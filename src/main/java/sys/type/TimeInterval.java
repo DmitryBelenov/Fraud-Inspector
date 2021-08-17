@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import sys.cache.CacheUnit;
 import sys.cache.DBCache;
 
+import java.lang.invoke.MethodHandles;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,7 +15,7 @@ import java.util.Iterator;
 import java.util.stream.Stream;
 
 public class TimeInterval implements CacheUnit {
-    public static final Logger log = LogManager.getLogger(TimeInterval.class);
+    public static final Logger log = LogManager.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final DCTInterval DC_T_INTERVAL = new DCTInterval();
 
@@ -145,7 +146,7 @@ public class TimeInterval implements CacheUnit {
                                 rs.getString(3),                        // DESCRIPTION
                                 rs.getLong(4),                          // INTERVAL_MS
                                 rs.getDate(5),                          // LAST_ACTIVITY_DT_TM
-                                Activity.valueOf(rs.getString(6))       // CODE
+                                Activity.valueOf(rs.getString(6))       // ACTIVITY
                         );
 
                         addByKey(id, ti);

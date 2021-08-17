@@ -2,10 +2,11 @@ package database;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Properties;
 
 public class DBPostgreSQL extends DBSource {
-    public static final Logger log = LogManager.getLogger(DBPostgreSQL.class);
+    public static final Logger log = LogManager.getLogger(MethodHandles.lookup().lookupClass());
 
     public DBPostgreSQL(Properties prop, String drvClass) throws Exception {
         super(prop);

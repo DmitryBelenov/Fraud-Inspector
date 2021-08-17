@@ -5,12 +5,13 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.beans.PropertyVetoException;
+import java.lang.invoke.MethodHandles;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
 public abstract class DBSource implements IDBConnection {
-    public static final Logger log = LogManager.getLogger(DBSource.class);
+    public static final Logger log = LogManager.getLogger(MethodHandles.lookup().lookupClass());
 
     private final ComboPooledDataSource cPoolDS;
 
