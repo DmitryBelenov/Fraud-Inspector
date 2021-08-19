@@ -1,5 +1,6 @@
 package sys.type;
 
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import sys.cache.CacheUnit;
@@ -65,6 +66,10 @@ public class TimeInterval implements CacheUnit {
 
     public Activity getActivity() {
         return activity;
+    }
+
+    public boolean readyForCleanStats(final ConsumerRecord<?, StatTransactionData> record) {
+        return System.currentTimeMillis() - record.timestamp() > intervalMs;
     }
 
     public static DCTInterval getDC() {

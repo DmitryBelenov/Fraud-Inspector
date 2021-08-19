@@ -20,4 +20,12 @@ public class BaseAttributes {
             ATTRIB_IDX.put(ATTRIBUTES[i], i);
         }
     }
+
+    public static int size() {
+        return ATTRIBUTES.length;
+    }
+
+    public static int getAttributeIdx(final String attrKey) {
+        return ATTRIB_IDX.getOrDefault(attrKey, -1);
+    }
 }

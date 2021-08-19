@@ -12,6 +12,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class StatCollector implements CacheUnit {
@@ -22,6 +25,8 @@ public class StatCollector implements CacheUnit {
     private static final String TABLE_NAME = "stat_collectors";
     private static final String[] FIELDS = new String[]{"ID", "CODE", "GROUP_BY", "FILTER", "LAST_ACTIVITY_DT_TM", "ACTIVITY"};
 
+    private final Lock lock = new ReentrantLock();
+
     private final Long id;
 
     private final String code;
@@ -29,6 +34,7 @@ public class StatCollector implements CacheUnit {
     private final String groupBy;
 
     private final String filter;
+    private Predicate<StatTransactionData> filterPredicate = t -> true;
 
     private final Date lastActivityDTm;
 
@@ -41,6 +47,8 @@ public class StatCollector implements CacheUnit {
         this.filter = filter;
         this.lastActivityDTm = lastActivityDTm;
         this.activity = activity;
+
+        initWhereFilter();
     }
 
     public Long getId() {
@@ -65,6 +73,41 @@ public class StatCollector implements CacheUnit {
 
     public Activity getActivity() {
         return activity;
+    }
+
+    public boolean filter(final StatTransactionData data) {
+        lock.lock();
+        try {
+            return filterPredicate.test(data);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private void initWhereFilter() {
+        if (filter == null) {
+            filterPredicate = t -> true;
+        } else {
+//            final Jep jep = UtilsJepFrd.createParser(statWhere);
+//            whereFilter = t -> {
+//                try {
+//                    try {
+//                        final Object conditionResult = UtilsJep.evaluate(jep, new TransactionDataContext(t), true);
+//                        if (conditionResult == null) {
+//                            throw new SSYSException(SSYSFDEx.CONDITION_RETURNED_NULL, statWhere);
+//                        }
+//                        return (Boolean) conditionResult;
+//                    } catch (final ClassCastException e) {
+//                        Utils.printException(log, e);
+//                        throw new SSYSException(SSYSFDEx.CONDITION_INVALID_RETURN_TYPE, "", e);
+//                    }
+//                } catch (final SSYSException e) {
+//                    log.error("Can't apply transaction to filter", e);
+//                    SSYSGw.stopWork(e);
+//                    return false;
+//                }
+//            };
+        }
     }
 
     public static DCStatCollector getDC() {

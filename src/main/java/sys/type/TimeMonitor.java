@@ -1,5 +1,6 @@
 package sys.type;
 
+import kafka.SlidingWindow;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import sys.cache.CacheUnit;
@@ -35,6 +36,8 @@ public class TimeMonitor implements CacheUnit {
 
     private final Activity activity;
 
+    private SlidingWindow swStatCleaner;
+
     public TimeMonitor(Long id, String code, String description, TimeInterval interval, StatCollector collector, Date lastActivityDTm, Activity activity) {
         this.id = id;
         this.code = code;
@@ -43,6 +46,8 @@ public class TimeMonitor implements CacheUnit {
         this.collector = collector;
         this.lastActivityDTm = lastActivityDTm;
         this.activity = activity;
+
+        swStatCleaner = new SlidingWindow(getCode(), interval, this::decrementStat);
     }
 
     public Long getId() {
@@ -71,6 +76,18 @@ public class TimeMonitor implements CacheUnit {
 
     public Activity getActivity() {
         return activity;
+    }
+
+    public void incrementStat(final StatTransactionData data) {
+        if (collector.filter(data)) {
+//            StatResolver.addTransToStat(this, data);
+        }
+    }
+
+    private void decrementStat(final StatTransactionData data) {
+        if (collector.filter(data)) {
+//            StatResolver.removeTransFromStat(this, data);
+        }
     }
 
     public static DCTMonitor getDC() {

@@ -20,6 +20,6 @@ public class CtxListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
-        // something on stop
+        FISystem.stopAllExecs();
     }
 }

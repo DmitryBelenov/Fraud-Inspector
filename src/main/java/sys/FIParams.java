@@ -6,4 +6,6 @@ public class FIParams {
     public static final String URL = System.getProperty("fi.sys.db.url");
     public static final String USER = System.getProperty("fi.sys.db.user");
     public static final String PASSWORD = System.getProperty("fi.sys.db.password");
+
+    public static String statTopicName = "statistics";
 }

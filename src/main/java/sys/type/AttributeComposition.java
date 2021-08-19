@@ -4,6 +4,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import sys.cache.CacheUnit;
 import sys.cache.DBCache;
+import utils.StringUtils;
 
 import java.lang.invoke.MethodHandles;
 import java.sql.Connection;
@@ -45,7 +46,10 @@ public class AttributeComposition implements CacheUnit {
 
         attrIdxMap = new HashMap<>();
         for (int i = 0; i < attributes.length; i++) {
-            attrIdxMap.put(attributes[i], i);
+            String attr = attributes[i];
+            if (!StringUtils.isNullOrEmpty(attr)) {
+                attrIdxMap.put(attr, i);
+            }
         }
     }
 
@@ -70,7 +74,7 @@ public class AttributeComposition implements CacheUnit {
     }
 
     public int getAttributeIdx(String attribute) {
-        return attrIdxMap.get(attribute);
+        return attrIdxMap.getOrDefault(attribute, -1);
     }
 
     public static DCAttributeComposition getDC() {
