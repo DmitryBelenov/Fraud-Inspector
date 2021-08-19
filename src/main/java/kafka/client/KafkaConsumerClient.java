@@ -78,8 +78,12 @@ public class KafkaConsumerClient<K, V extends IRestore> implements Closeable {
         }
     }
 
+    public ConsumerRecords<K, V> poll(Duration duration) {
+        return consumer.poll(duration);
+    }
+
     public ConsumerRecords<K, V> poll() {
-        return consumer.poll(DURATION);
+        return poll(DURATION);
     }
 
     public long endOffset() {

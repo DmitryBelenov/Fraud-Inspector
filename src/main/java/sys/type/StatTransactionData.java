@@ -41,4 +41,8 @@ public class StatTransactionData implements Serializable, IRestore {
             ac = AttributeHolder.getByCode(attrCode);
         }
     }
+
+    public String[] getAttrValues() {
+        return attrValues;
+    }
 }

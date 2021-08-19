@@ -39,7 +39,7 @@ public class TransportTransactionData implements Serializable, IRestore {
 
     @Override
     public void restore() {
-        respCtx = HttpProcessor.ASYNC_CTX_CACHE.remove(id);
+        respCtx = HttpProcessor.acCtxMap.remove(id);
         if (respCtx != null) {
             log.error("Async context, id:" + id + ", restored");
         }

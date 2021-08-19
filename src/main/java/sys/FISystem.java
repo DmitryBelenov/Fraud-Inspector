@@ -1,6 +1,7 @@
 package sys;
 
 import database.DBConnectionHolder;
+import kafka.BootstrapStatLoader;
 import kafka.PaymentLoader;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -30,12 +31,14 @@ public class FISystem {
             syncLoadDBCaches();
             AttributeHolder.init();
 
+            BootstrapStatLoader.load();
             PaymentLoader.start();
 
             log.info("\n\n        *****************************************************\n" +
                       "                       FI SYSTEM LOADED SUCCESSFULLY           \n" +
                       "        *****************************************************");
         } catch (Exception e) {
+            FISystem.stopAllExecs();
             log.error(e);
             log.error("\n\n        ****************************************************\n" +
                         "                       FI SYSTEM LOADING FAULT              \n" +

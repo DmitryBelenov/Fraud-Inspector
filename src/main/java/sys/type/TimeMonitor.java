@@ -36,7 +36,7 @@ public class TimeMonitor implements CacheUnit {
 
     private final Activity activity;
 
-    private SlidingWindow swStatCleaner;
+    private final SlidingWindow swStatCleaner;
 
     public TimeMonitor(Long id, String code, String description, TimeInterval interval, StatCollector collector, Date lastActivityDTm, Activity activity) {
         this.id = id;
