@@ -5,6 +5,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import sys.cache.CacheUnit;
 import sys.cache.DBCache;
+import utils.StringUtils;
 
 import java.lang.invoke.MethodHandles;
 import java.sql.Connection;
@@ -15,12 +16,16 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.stream.Stream;
 
-public class TimeMonitor implements CacheUnit {
+public class TimeMonitor implements CacheUnit, IDBType {
     public static final Logger log = LogManager.getLogger(MethodHandles.lookup().lookupClass());
     private static final DCTMonitor DC_T_MONITOR = new DCTMonitor();
 
     private static final String TABLE_NAME = "time_monitors";
     private static final String[] FIELDS = new String[]{"ID", "CODE", "DESCRIPTION", "INTERVAL_ID", "COLLECTOR_ID", "LAST_ACTIVITY_DT_TM", "ACTIVITY"};
+    private static final String[] SQL_FIELDS = new String[FIELDS.length - 3];
+    static {
+        System.arraycopy(FIELDS, 1, SQL_FIELDS, 0, 4);
+    }
 
     private final Long id;
 
@@ -112,6 +117,26 @@ public class TimeMonitor implements CacheUnit {
 
     public static Iterator<TimeMonitor> getIterator() {
         return DC_T_MONITOR.cacheVIterator();
+    }
+
+    @Override
+    public String getTableName() {
+        return TABLE_NAME;
+    }
+
+    @Override
+    public String[] getFields() {
+        return SQL_FIELDS;
+    }
+
+    @Override
+    public String getValuesString() {
+        return StringUtils.getSQLValues(
+                code,
+                description,
+                interval.getId(),
+                collector.getId()
+        );
     }
 
     private static class DCTMonitor extends DBCache<TimeMonitor> {

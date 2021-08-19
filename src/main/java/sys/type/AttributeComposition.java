@@ -17,13 +17,17 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public class AttributeComposition implements CacheUnit {
+public class AttributeComposition implements CacheUnit, IDBType {
     public static final Logger log = LogManager.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final DCAttributeComposition DC_ATTRIBUTE_COMPOSITION = new DCAttributeComposition();
 
     private static final String TABLE_NAME = "attribute_compositions";
     private static final String[] FIELDS = new String[]{"ID", "CODE", "ATTRIBUTES", "LAST_ACTIVITY_DT_TM", "ACTIVITY"};
+    private static final String[] SQL_FIELDS = new String[FIELDS.length - 3];
+    static {
+        System.arraycopy(FIELDS, 1, SQL_FIELDS, 0, 2);
+    }
 
     private final Map<String, Integer> attrIdxMap;
 
@@ -33,13 +37,16 @@ public class AttributeComposition implements CacheUnit {
 
     private final String[] attributes;
 
+    private final String attributesStr;
+
     private final Date lastActivityDTm;
 
     private final Activity activity;
 
-    public AttributeComposition(Long id, String code, String[] attributes, Date lastActivityDTm, Activity activity) {
+    public AttributeComposition(Long id, String code, String attributesStr, String[] attributes, Date lastActivityDTm, Activity activity) {
         this.id = id;
         this.code = code;
+        this.attributesStr = attributesStr;
         this.attributes = attributes;
         this.lastActivityDTm = lastActivityDTm;
         this.activity = activity;
@@ -59,6 +66,10 @@ public class AttributeComposition implements CacheUnit {
 
     public String getCode() {
         return code;
+    }
+
+    public String getAttributesStr() {
+        return attributesStr;
     }
 
     public String[] getAttributes() {
@@ -99,6 +110,24 @@ public class AttributeComposition implements CacheUnit {
 
     public static Iterator<AttributeComposition> getIterator() {
         return DC_ATTRIBUTE_COMPOSITION.cacheVIterator();
+    }
+
+    @Override
+    public String getTableName() {
+        return TABLE_NAME;
+    }
+
+    @Override
+    public String[] getFields() {
+        return SQL_FIELDS;
+    }
+
+    @Override
+    public String getValuesString() {
+        return StringUtils.getSQLValues(
+                code,
+                attributesStr
+        );
     }
 
     private static class DCAttributeComposition extends DBCache<AttributeComposition> {
@@ -151,11 +180,13 @@ public class AttributeComposition implements CacheUnit {
                     while (rs.next()) {
                         final Long id = rs.getLong(1);               // ID
                         final String code = rs.getString(2);         // CODE
-                        final String[] attributes = rs.getString(3).split(","); // ATTRIBUTES
+                        final String attributeStr = rs.getString(3);
+                        final String[] attributes = attributeStr.split(","); // ATTRIBUTES
 
                         AttributeComposition ac = new AttributeComposition(
                                 id,
                                 code,
+                                attributeStr,
                                 attributes,
                                 rs.getDate(5),                      // LAST_ACTIVITY_DT_TM
                                 Activity.valueOf(rs.getString(6))   // ACTIVITY

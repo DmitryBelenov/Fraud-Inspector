@@ -4,6 +4,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import sys.cache.CacheUnit;
 import sys.cache.DBCache;
+import utils.StringUtils;
 
 import java.lang.invoke.MethodHandles;
 import java.sql.Connection;
@@ -17,13 +18,17 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public class StatCollector implements CacheUnit {
+public class StatCollector implements CacheUnit, IDBType {
     public static final Logger log = LogManager.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final DCStatCollector DC_STAT_COLLECTOR = new DCStatCollector();
 
     private static final String TABLE_NAME = "stat_collectors";
     private static final String[] FIELDS = new String[]{"ID", "CODE", "GROUP_BY", "FILTER", "LAST_ACTIVITY_DT_TM", "ACTIVITY"};
+    private static final String[] SQL_FIELDS = new String[FIELDS.length - 3];
+    static {
+        System.arraycopy(FIELDS, 1, SQL_FIELDS, 0, 3);
+    }
 
     private final Lock lock = new ReentrantLock();
 
@@ -132,6 +137,25 @@ public class StatCollector implements CacheUnit {
 
     public static Iterator<StatCollector> getIterator() {
         return DC_STAT_COLLECTOR.cacheVIterator();
+    }
+
+    @Override
+    public String getTableName() {
+        return TABLE_NAME;
+    }
+
+    @Override
+    public String[] getFields() {
+        return SQL_FIELDS;
+    }
+
+    @Override
+    public String getValuesString() {
+        return StringUtils.getSQLValues(
+                code,
+                groupBy,
+                filter
+        );
     }
 
     private static class DCStatCollector extends DBCache<StatCollector> {

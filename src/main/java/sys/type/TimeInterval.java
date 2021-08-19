@@ -5,6 +5,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import sys.cache.CacheUnit;
 import sys.cache.DBCache;
+import utils.StringUtils;
 
 import java.lang.invoke.MethodHandles;
 import java.sql.Connection;
@@ -15,13 +16,17 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.stream.Stream;
 
-public class TimeInterval implements CacheUnit {
+public class TimeInterval implements CacheUnit, IDBType {
     public static final Logger log = LogManager.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final DCTInterval DC_T_INTERVAL = new DCTInterval();
 
     private static final String TABLE_NAME = "time_intervals";
     private static final String[] FIELDS = new String[]{"ID", "CODE", "DESCRIPTION", "INTERVAL_MS", "LAST_ACTIVITY_DT_TM", "ACTIVITY"};
+    private static final String[] SQL_FIELDS = new String[FIELDS.length - 3];
+    static {
+        System.arraycopy(FIELDS, 1, SQL_FIELDS, 0, 3);
+    }
 
     private final Long id;
 
@@ -94,6 +99,25 @@ public class TimeInterval implements CacheUnit {
 
     public static Iterator<TimeInterval> getIterator() {
         return DC_T_INTERVAL.cacheVIterator();
+    }
+
+    @Override
+    public String getTableName() {
+        return TABLE_NAME;
+    }
+
+    @Override
+    public String[] getFields() {
+        return SQL_FIELDS;
+    }
+
+    @Override
+    public String getValuesString() {
+        return StringUtils.getSQLValues(
+                code,
+                description,
+                intervalMs
+        );
     }
 
     private static class DCTInterval extends DBCache<TimeInterval> {
