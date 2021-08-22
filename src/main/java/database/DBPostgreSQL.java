@@ -28,7 +28,7 @@ public class DBPostgreSQL extends DBSource {
     }
 
     @Override
-    void insert(IDBType type) {
+    public void insert(IDBType type) {
         dbSrv.execute(() -> {
             final String fields = String.join(",", type.getFields());
             final String sql = String.format(INSERT, type.getTableName(), fields, type.getValuesString());
@@ -42,9 +42,9 @@ public class DBPostgreSQL extends DBSource {
     }
 
     @Override
-    void update(IDBType type, String where) {
+    public void update(IDBType type, String valWhere) {
         dbSrv.execute(() -> {
-            final String sql = String.format(UPDATE, type.getTableName(), where);
+            final String sql = String.format(UPDATE, type.getTableName(), valWhere);
             try (Connection conn = getConnection();
                  PreparedStatement ps = conn.prepareStatement(sql)) {
                  ps.executeUpdate();

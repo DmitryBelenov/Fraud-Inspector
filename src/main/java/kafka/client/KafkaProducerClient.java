@@ -6,6 +6,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.apache.kafka.common.serialization.LongSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import sys.FIParams;
 import utils.UtilsSerialization;
 
 import java.io.Serializable;
@@ -16,7 +17,7 @@ import java.util.Properties;
 public class KafkaProducerClient {
     private final Map<Class<?>, KafkaProducer<Object, Object>> producers = new HashMap<>();
     private final KafkaProducer<Object, Object> defProducer;
-    private static KafkaProducerClient instance;
+    public static KafkaProducerClient instance;
 
     public static void setInstance() {
         if (instance == null) {
@@ -28,7 +29,7 @@ public class KafkaProducerClient {
         final Properties props = new Properties();
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class.getName());
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class.getName());
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka Broker ip");
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, FIParams.kafkaBrokerHost);
         props.put(ProducerConfig.ACKS_CONFIG, "all");
         props.put(ProducerConfig.RETRIES_CONFIG, 0);
         props.put(ProducerConfig.BATCH_SIZE_CONFIG, 16384);

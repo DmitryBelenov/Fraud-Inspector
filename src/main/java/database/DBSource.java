@@ -46,11 +46,11 @@ public abstract class DBSource implements IDBConnection {
         return cPoolDS.getConnection();
     }
 
-    abstract void insert(IDBType type);
+    public abstract void insert(IDBType type);
 
-    abstract void update(IDBType type, String where);
+    public abstract void update(IDBType type, String valWhere);
 
-    ResultSet callableSQL(String sql) {
+    public ResultSet callableSQL(String sql) {
         Callable<ResultSet> callTask = ()-> {
             try (Connection conn = getConnection();
                  PreparedStatement ps = conn.prepareStatement(sql)) {

@@ -1,5 +1,6 @@
 package kafka.client;
 
+import sys.FIParams;
 import sys.type.IRestore;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.TopicPartition;
@@ -42,9 +43,9 @@ public class KafkaConsumerClient<K, V extends IRestore> implements Closeable {
         props = new Properties();
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, keyDeserializer.getName());
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class.getName());
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "system identifier" + "." + name);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, FIParams.systemIdentifier + "." + name);
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka broker from config");
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, FIParams.kafkaBrokerHost);
         props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, MAX_POLL_RECORDS);
     }
 

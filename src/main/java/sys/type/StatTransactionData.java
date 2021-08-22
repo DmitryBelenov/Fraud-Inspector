@@ -19,6 +19,9 @@ public class StatTransactionData implements Serializable, IRestore {
     @SerializedName("attr_values")
     public String[] attrValues;
 
+    @SerializedName("suspicious")
+    public Boolean isSuspicious;
+
     public StatTransactionData() {
     }
 
@@ -44,5 +47,13 @@ public class StatTransactionData implements Serializable, IRestore {
 
     public String[] getAttrValues() {
         return attrValues;
+    }
+
+    public Boolean getSuspicious() {
+        return isSuspicious;
+    }
+
+    public void setSuspicious(Boolean suspicious) {
+        isSuspicious = suspicious;
     }
 }

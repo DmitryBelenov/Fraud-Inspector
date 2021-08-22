@@ -12,7 +12,7 @@ public class HttpReply implements Serializable {
     public boolean resultOK;
 
     @SerializedName("s")
-    public String isSuspected;
+    public String isSuspicious;
 
     @SerializedName("a")
     public String action;
@@ -23,9 +23,9 @@ public class HttpReply implements Serializable {
     @SerializedName("dt")
     public Date date;
 
-    public HttpReply(boolean resultOK, String isSuspected, String action, String reason) {
+    public HttpReply(boolean resultOK, String isSuspicious, String action, String reason) {
         this.resultOK = resultOK;
-        this.isSuspected = isSuspected;
+        this.isSuspicious = isSuspicious;
         this.action = action;
         this.reason = reason;
         this.date = new Date();

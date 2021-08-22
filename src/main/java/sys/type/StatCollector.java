@@ -11,8 +11,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.Iterator;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
@@ -37,6 +36,7 @@ public class StatCollector implements CacheUnit, IDBType {
     private final String code;
 
     private final String groupBy;
+    private Set<String> groupBySet;
 
     private final String filter;
     private Predicate<StatTransactionData> filterPredicate = t -> true;
@@ -53,6 +53,7 @@ public class StatCollector implements CacheUnit, IDBType {
         this.lastActivityDTm = lastActivityDTm;
         this.activity = activity;
 
+        initGroupBy();
         initWhereFilter();
     }
 
@@ -66,6 +67,10 @@ public class StatCollector implements CacheUnit, IDBType {
 
     public String getGroupBy() {
         return groupBy;
+    }
+
+    public Set<String> getGroupBySet() {
+        return groupBySet;
     }
 
     public String getFilter() {
@@ -86,6 +91,14 @@ public class StatCollector implements CacheUnit, IDBType {
             return filterPredicate.test(data);
         } finally {
             lock.unlock();
+        }
+    }
+
+    private void initGroupBy() {
+        if (groupBy == null) {
+            this.groupBySet = Collections.emptySet();
+        } else {
+            this.groupBySet = new TreeSet<>(StringUtils.breakString(groupBy, StringUtils.PARAM_DELIMITERS));
         }
     }
 

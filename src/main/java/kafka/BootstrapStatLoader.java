@@ -59,7 +59,7 @@ public class BootstrapStatLoader {
                 Iterator<TimeMonitor> tmIt = TimeMonitor.getIterator();
                 while (tmIt.hasNext()) {
                     TimeMonitor tm = tmIt.next();
-                    tm.incrementStat(tData);
+                    tm.addToStatistics(tData);
                 }
                 final String key = data.getKey();
                 RECOVERED_KEYS.add(key);

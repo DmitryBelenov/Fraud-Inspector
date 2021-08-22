@@ -9,7 +9,10 @@ import org.apache.log4j.Logger;
 import service.HttpProcessor;
 import service.HttpReply;
 import sys.FIParams;
+import sys.TransactionCheckingCenter;
+import sys.type.CheckResult;
 import sys.type.TransportTransactionData;
+import utils.StringUtils;
 import utils.SysUtils;
 
 import javax.servlet.AsyncContext;
@@ -39,18 +42,18 @@ public class PaymentLoader implements Runnable {
             if (!records.isEmpty()) {
                 for (final ConsumerRecord<String, TransportTransactionData> record : records) {
                     if (LOADING.get()) {
-                        TransportTransactionData item = kafkaConsumerCli.readRecord(record);
-                        final Long id = item.getId();
+                        TransportTransactionData transport = kafkaConsumerCli.readRecord(record);
+                        final Long id = transport.getId();
                         HttpReply reply;
                         try {
-//                            final FTCheckResult result = FraudTransactionHandler.instance().checkTransaction(item.getData(), id);
-                            reply = new HttpReply(true, "res here", "action here", "description here");
+                            final CheckResult result = TransactionCheckingCenter.instance().checkTransaction(transport.getData(), id);
+                            reply = new HttpReply(true, StringUtils.booleanYNWrapper(result.isSuspicious()), result.getPostAction().getShortName(), result.getInfo());
                         } catch (Exception se) {
                             log.error(se);
                             reply = new HttpReply(false, "N/A", "N/A", "Transaction handling error");
                         }
 
-                        final AsyncContext asyncContext = item.getRespCtx();
+                        final AsyncContext asyncContext = transport.getRespCtx();
                         HttpProcessor.writeAsyncReply(id, asyncContext, reply);
                         kafkaConsumerCli.commitAsync();
                     }

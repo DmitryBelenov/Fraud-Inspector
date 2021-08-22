@@ -5,6 +5,9 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import sys.cache.CacheUnit;
 import sys.cache.DBCache;
+import sys.key.FIKeyCmp;
+import sys.stat.StatisticsProcessor;
+import sys.stat.TimeStatistics;
 import utils.StringUtils;
 
 import java.lang.invoke.MethodHandles;
@@ -13,7 +16,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.stream.Stream;
 
 public class TimeMonitor implements CacheUnit, IDBType {
@@ -43,6 +48,8 @@ public class TimeMonitor implements CacheUnit, IDBType {
 
     private final SlidingWindow swStatCleaner;
 
+    private final Map<FIKeyCmp, TimeStatistics> statistics;
+
     public TimeMonitor(Long id, String code, String description, TimeInterval interval, StatCollector collector, Date lastActivityDTm, Activity activity) {
         this.id = id;
         this.code = code;
@@ -52,7 +59,8 @@ public class TimeMonitor implements CacheUnit, IDBType {
         this.lastActivityDTm = lastActivityDTm;
         this.activity = activity;
 
-        swStatCleaner = new SlidingWindow(getCode(), interval, this::decrementStat);
+        swStatCleaner = new SlidingWindow(getCode(), interval, this::removeFromStatistics);
+        statistics = new HashMap<>();
     }
 
     public Long getId() {
@@ -75,6 +83,10 @@ public class TimeMonitor implements CacheUnit, IDBType {
         return collector;
     }
 
+    public Map<FIKeyCmp, TimeStatistics> getStatistics() {
+        return statistics;
+    }
+
     public Date getLastActivityDTm() {
         return lastActivityDTm;
     }
@@ -83,15 +95,15 @@ public class TimeMonitor implements CacheUnit, IDBType {
         return activity;
     }
 
-    public void incrementStat(final StatTransactionData data) {
+    public void addToStatistics(final StatTransactionData data) {
         if (collector.filter(data)) {
-//            StatResolver.addTransToStat(this, data);
+            StatisticsProcessor.addToStatistics(this, data);
         }
     }
 
-    private void decrementStat(final StatTransactionData data) {
+    private void removeFromStatistics(final StatTransactionData data) {
         if (collector.filter(data)) {
-//            StatResolver.removeTransFromStat(this, data);
+            StatisticsProcessor.removeFromStatistics(this, data);
         }
     }
 

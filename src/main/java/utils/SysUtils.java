@@ -36,6 +36,9 @@ public class SysUtils {
         }
     }
 
+    /**
+     * Base method for create threads and put into the pool
+     * */
     public static ExecutorService newFixedThreadPool(final String name, final int size) {
         final ExecutorService s = Executors.newFixedThreadPool(size,
                 new ThreadFactory() {
