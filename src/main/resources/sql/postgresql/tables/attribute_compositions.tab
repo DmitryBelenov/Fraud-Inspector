@@ -1,0 +1,10 @@
+CREATE TABLE attribute_compositions (
+    ID                   numeric(16) DEFAULT nextval('serial') NOT NULL,
+    CODE                 varchar(100) NOT NULL,
+    ATTRIBUTES           varchar(2048),
+    LAST_ACTIVITY_DT_TM  Date DEFAULT CURRENT_TIMESTAMP,
+    ACTIVITY             varchar(1) DEFAULT 'A',
+
+    CONSTRAINT at_com_ID_pk PRIMARY KEY(ID),
+    UNIQUE(CODE)
+);
