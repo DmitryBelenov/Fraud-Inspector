@@ -20,6 +20,5 @@ public class JepStatFunction implements PostfixMathCommandI {
 
     @Override
     public void setCurNumberOfParameters(int i) {
-
     }
 }
