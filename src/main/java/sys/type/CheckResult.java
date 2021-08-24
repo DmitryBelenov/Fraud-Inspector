@@ -21,32 +21,32 @@ public class CheckResult implements CacheUnit, IDBType {
 
     private static final DCCheckResult DC_CHECK_RESULT = new DCCheckResult();
 
-    private static final String TABLE_NAME = "function_weights";
+    private static final String TABLE_NAME = "check_results";
     private static final String[] FIELDS = new String[]{"ID", "AMOUNT", "IS_SUSPICIOUS", "INFO", "AC_CODE", "ATTRIBUTES", "WEIGHT_ID", "LAST_ACTIVITY_DT_TM", "ACTIVITY"};
     private static final String[] SQL_FIELDS = new String[FIELDS.length - 3];
     static {
         System.arraycopy(FIELDS, 1, SQL_FIELDS, 0, 6);
     }
 
-    private final Long id;
+    private Long id;
 
-    private final String amount;
+    private String amount;
 
-    private final boolean isSuspicious;
+    private boolean isSuspicious;
 
     private PostAction postAction;
 
-    private final String info;
+    private String info;
 
-    private final String acCode;
+    private String acCode;
 
-    private final String attributes;
+    private String attributes;
 
-    private final FunctionWeight weight;
+    private FunctionWeight weight;
 
-    private final Date lastActivityDTm;
+    private Date lastActivityDTm;
 
-    private final Activity activity;
+    private Activity activity;
 
     public CheckResult(Long id, String amount, boolean isSuspicious, String info, String acCode, String attributes, FunctionWeight weight, Date lastActivityDTm, Activity activity) {
         this.id = id;
@@ -60,6 +60,10 @@ public class CheckResult implements CacheUnit, IDBType {
         this.activity = activity;
 
         postAction = null;
+    }
+
+    public static CheckResult buildFtCheckResult(final Long paymentId, final StatTransactionData data) {
+        return null;
     }
 
     public Long getId() {

@@ -18,12 +18,14 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 
 public class BootstrapStatLoader {
     private static final Logger log = LogManager.getLogger(MethodHandles.lookup().lookupClass());
     public static final Set<String> RECOVERED_KEYS = ConcurrentHashMap.newKeySet();
 
     private static KafkaConsumerClient<String, StatTransactionData> consumerClient;
+    public static final CountDownLatch BOOTSTRAP_LATCH = new CountDownLatch(1);
 
     private static void initConsumer() {
         consumerClient = new KafkaConsumerClient<>("bootstrap.stat.loader", FIParams.statTopicName, StringDeserializer.class);
@@ -68,8 +70,7 @@ public class BootstrapStatLoader {
             }
             consumerClient.commitAsync();
         }
-        BootstrapStatChecker.setLoaded();
-
         log.info("Stop stat bootloader");
+        BootstrapStatLoader.BOOTSTRAP_LATCH.countDown();
     }
 }

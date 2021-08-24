@@ -28,7 +28,7 @@ public class AttributeHolder {
             final AttributeComposition ac = acIt.next();
             versions.put(ac.getCode(), ac);
         }
-        log.info("Attribute holder: " + versions.size() + " cmp.");
+        log.info("Attribute holder get " + versions.size() + " compositions");
     }
 
     public static AttributeComposition getByCode(final String acCode) {

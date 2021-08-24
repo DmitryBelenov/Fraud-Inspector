@@ -7,10 +7,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import sys.cache.AttributeHolder;
 import sys.cache.DBCacheLoader;
-import sys.type.AttributeComposition;
-import sys.type.StatCollector;
-import sys.type.TimeInterval;
-import sys.type.TimeMonitor;
+import sys.type.*;
 
 import java.lang.invoke.MethodHandles;
 import java.sql.SQLException;
@@ -39,7 +36,7 @@ public class FISystem {
                       "        *****************************************************");
         } catch (Exception e) {
             FISystem.stopAllExecs();
-            log.error(e);
+            log.error(e.getMessage() + " cause: " + e.getCause().getMessage());
             log.error("\n\n        ****************************************************\n" +
                         "                       FI SYSTEM LOADING FAULT              \n" +
                         "        ****************************************************");
@@ -49,9 +46,12 @@ public class FISystem {
     private static void syncLoadDBCaches() throws SQLException {
         /* order matters */
         /* 1 */ DBCacheLoader.add(AttributeComposition.getDC());
-        /* 2 */ DBCacheLoader.add(TimeInterval.getDC());
-        /* 3 */ DBCacheLoader.add(StatCollector.getDC());
-        /* 4 */ DBCacheLoader.add(TimeMonitor.getDC());
+        /* 2 */ DBCacheLoader.add(FunctionWeight.getDC());
+        /* 3 */ DBCacheLoader.add(DeterminingFunction.getDC());
+        /* 4 */ DBCacheLoader.add(TimeInterval.getDC());
+        /* 5 */ DBCacheLoader.add(StatCollector.getDC());
+        /* 6 */ DBCacheLoader.add(TimeMonitor.getDC());
+        /* 7 */ DBCacheLoader.add(CheckResult.getDC());
 
         DBCacheLoader.loadAll();
     }

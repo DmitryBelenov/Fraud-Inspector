@@ -78,7 +78,6 @@ public class TransactionCheckingCenter {
     }
 
     private CheckResult check(final Long id, final StatTransactionData data) throws Exception {
-        final CheckResult result = null;
-        return result;
+        return ResultExtractor.extract(id, data);
     }
 }

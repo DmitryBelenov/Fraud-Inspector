@@ -14,11 +14,12 @@ public class FIParams {
      * */
     public static final String httpEncoding = "UTF-8";
     public static final String systemIdentifier = "PC";
+    public static final int gwTopCPUUsagesCount = Integer.parseInt(System.getProperty("fi.sys.report_top.cpu.usages", "10"));
 
     /**
      * Kafka
      * */
-    public static String kafkaBrokerHost = System.getProperty("fi.sys.kafka.broker", "localhost");
+    public static String kafkaBrokerHost = System.getProperty("fi.sys.kafka.broker", "localhost:9092");
     public static String statTopicName = "statistics";
     public static String paymentsTopicName = "transactions";
 }

@@ -58,9 +58,15 @@ public class SlidingWindow implements Runnable {
 
     @Override
     public void run() {
+        try {
+            BootstrapStatLoader.BOOTSTRAP_LATCH.await();
+        } catch (InterruptedException e) {
+            log.error("Bootstrap stat loading error. Unable to start sliding window " + consumerName, e);
+            return;
+        }
+
         log.info("Start sw consumer: " + consumerName);
         while (!closing) {
-            if (BootstrapStatChecker.isLoaded()) {
                 final ConsumerRecords<String, StatTransactionData> records = kafkaConsumerCli.poll();
                 if (!records.isEmpty()) {
                     for (final ConsumerRecord<String, StatTransactionData> record : records) {
@@ -87,7 +93,6 @@ public class SlidingWindow implements Runnable {
 
                     return;
                 }
-            }
         }
         kafkaConsumerCli.close();
         log.info("Close sw consumer: " + consumerName);
