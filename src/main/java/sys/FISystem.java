@@ -3,11 +3,13 @@ package sys;
 import database.DBConnectionHolder;
 import kafka.BootstrapStatLoader;
 import kafka.PaymentLoader;
+import kafka.client.KafkaProducerClient;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import sys.cache.AttributeHolder;
 import sys.cache.DBCacheLoader;
 import sys.type.*;
+import utils.SysReports;
 
 import java.lang.invoke.MethodHandles;
 import java.sql.SQLException;
@@ -31,12 +33,15 @@ public class FISystem {
             BootstrapStatLoader.load();
             PaymentLoader.start();
 
+            KafkaProducerClient.setInstance();
+            SysReports.startCpuUsageReport();
+
             log.info("\n\n        *****************************************************\n" +
                       "                       FI SYSTEM LOADED SUCCESSFULLY           \n" +
                       "        *****************************************************");
-        } catch (Exception e) {
+        } catch (Throwable e) {
             FISystem.stopAllExecs();
-            log.error(e.getMessage() + " cause: " + e.getCause().getMessage());
+            log.error("System throws error while loading", e);
             log.error("\n\n        ****************************************************\n" +
                         "                       FI SYSTEM LOADING FAULT              \n" +
                         "        ****************************************************");

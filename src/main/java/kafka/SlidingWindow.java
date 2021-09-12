@@ -82,16 +82,11 @@ public class SlidingWindow implements Runnable {
                             final Date schedule = new Date(record.timestamp() + interval.getIntervalMs());
                             taskScheduler.schedule(this, schedule);
 
-                            log.trace("Future event registered for " + consumerName + " on " + schedule);
+                            log.info("Future event registered for " + consumerName + " on " + schedule);
                             return;
                         }
                     }
                     kafkaConsumerCli.commitAsync();
-                } else {
-                    final long scheduleAt = new Date().getTime() + interval.getIntervalMs();
-                    taskScheduler.schedule(this, new Date(scheduleAt));
-
-                    return;
                 }
         }
         kafkaConsumerCli.close();

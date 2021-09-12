@@ -172,7 +172,7 @@ public class FunctionWeight implements CacheUnit, IDBType {
                                 rs.getLong(3),                          // WEIGHT
                                 rs.getLong(4),                          // PRIORITY
                                 rs.getDate(5),                          // LAST_ACTIVITY_DT_TM
-                                Activity.valueOf(rs.getString(9))       // ACTIVITY
+                                Activity.valueOf(rs.getString(6))       // ACTIVITY
                         );
 
                         addByKey(id, sc);

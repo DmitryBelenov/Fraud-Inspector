@@ -2,6 +2,7 @@ package sys.stat;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Optional;
 
 public interface IStatistic {
 
@@ -112,9 +113,9 @@ public interface IStatistic {
                             ",avgAppVal="  + getAverageApprovedValue().doubleValue() +
                             ",avgRejVal="  + getAverageRejectedValue().doubleValue() +
                             ",freqAppCnt=" + getFreqApprovedCount()    +
-                            ",freqAppVal=" + getFreqApprovedValue().doubleValue()    +
+                            ",freqAppVal=" + Optional.ofNullable(getFreqApprovedValue()).map(BigDecimal::doubleValue).orElse(0d)    +
                             ",freqRejCnt=" + getFreqRejectedCount()    +
-                            ",freqRejVal=" + getFreqRejectedValue().doubleValue()    +
+                            ",freqRejVal=" + Optional.ofNullable(getFreqRejectedValue()).map(BigDecimal::doubleValue).orElse(0d)    +
                             ",lastAppDt="  + getLastApprovedDate()     +
                             ",lastRejDt="  + getLastRejectedDate()     +
                             "]";

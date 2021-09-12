@@ -188,8 +188,8 @@ public class AttributeComposition implements CacheUnit, IDBType {
                                 code,
                                 attributeStr,
                                 attributes,
-                                rs.getDate(5),                      // LAST_ACTIVITY_DT_TM
-                                Activity.valueOf(rs.getString(6))   // ACTIVITY
+                                rs.getDate(4),                      // LAST_ACTIVITY_DT_TM
+                                Activity.valueOf(rs.getString(5))   // ACTIVITY
                         );
 
                         addByKey(id, ac);

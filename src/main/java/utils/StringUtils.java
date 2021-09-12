@@ -38,6 +38,8 @@ public class StringUtils {
             } else if (o instanceof Long) {
                 final Long numValue = (Long) o;
                 quoted.add(String.valueOf(numValue));
+            } else if (o == null) {
+                quoted.add("null");
             }
         }
         return String.join(",", quoted);

@@ -1,10 +1,15 @@
 package sys.type;
 
+import attribute.BaseAttributes;
+import attribute.RequiredField;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import sys.FIParams;
+import sys.cache.AttributeHolder;
 import sys.cache.CacheUnit;
 import sys.cache.DBCache;
 import sys.type.DeterminingFunction.PostAction;
+import utils.JsonUtils;
 import utils.StringUtils;
 
 import java.lang.invoke.MethodHandles;
@@ -14,6 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class CheckResult implements CacheUnit, IDBType {
@@ -22,17 +28,17 @@ public class CheckResult implements CacheUnit, IDBType {
     private static final DCCheckResult DC_CHECK_RESULT = new DCCheckResult();
 
     private static final String TABLE_NAME = "check_results";
-    private static final String[] FIELDS = new String[]{"ID", "AMOUNT", "IS_SUSPICIOUS", "INFO", "AC_CODE", "ATTRIBUTES", "WEIGHT_ID", "LAST_ACTIVITY_DT_TM", "ACTIVITY"};
+    private static final String[] FIELDS = new String[]{"ID", "AMOUNT", "IS_SUSPICIOUS", "INFO", "AC_CODE", "ATTRIBUTES", "WEIGHT_ID", "PRIORITY", "LAST_ACTIVITY_DT_TM", "ACTIVITY"};
     private static final String[] SQL_FIELDS = new String[FIELDS.length - 3];
     static {
-        System.arraycopy(FIELDS, 1, SQL_FIELDS, 0, 6);
+        System.arraycopy(FIELDS, 1, SQL_FIELDS, 0, 7);
     }
 
     private Long id;
 
     private String amount;
 
-    private boolean isSuspicious;
+    private Boolean isSuspicious;
 
     private PostAction postAction;
 
@@ -44,11 +50,13 @@ public class CheckResult implements CacheUnit, IDBType {
 
     private FunctionWeight weight;
 
+    private Long priority;
+
     private Date lastActivityDTm;
 
     private Activity activity;
 
-    public CheckResult(Long id, String amount, boolean isSuspicious, String info, String acCode, String attributes, FunctionWeight weight, Date lastActivityDTm, Activity activity) {
+    public CheckResult(Long id, String amount, boolean isSuspicious, String info, String acCode, String attributes, FunctionWeight weight, Long priority, Date lastActivityDTm, Activity activity) {
         this.id = id;
         this.amount = amount;
         this.isSuspicious = isSuspicious;
@@ -56,14 +64,26 @@ public class CheckResult implements CacheUnit, IDBType {
         this.acCode = acCode;
         this.attributes = attributes;
         this.weight = weight;
+        this.priority = priority;
         this.lastActivityDTm = lastActivityDTm;
         this.activity = activity;
 
         postAction = null;
     }
 
-    public static CheckResult buildFtCheckResult(final Long paymentId, final StatTransactionData data) {
-        return null;
+    public static CheckResult buildFtCheckResult(final StatTransactionData data) throws Exception {
+        return new CheckResult(
+                null, // generate sys id while store to db
+                data.getValue(BaseAttributes.getAttributeIdx(RequiredField.Amt.name())),
+                false,
+                FIParams.NOT_AVAILABLE,
+                Optional.ofNullable(data.getAc()).map(AttributeComposition::getCode).orElse(FIParams.NOT_AVAILABLE),
+                JsonUtils.toJson(data.getAttrValues()),
+                null,
+                null,
+                null,
+                Activity.A
+                );
     }
 
     public Long getId() {
@@ -90,6 +110,10 @@ public class CheckResult implements CacheUnit, IDBType {
         return info;
     }
 
+    public void setInfo(String info) {
+        this.info = info;
+    }
+
     public String getAcCode() {
         return acCode;
     }
@@ -102,12 +126,33 @@ public class CheckResult implements CacheUnit, IDBType {
         return weight;
     }
 
+    public void setWeight(FunctionWeight weight) {
+        this.weight = weight;
+    }
+
     public Date getLastActivityDTm() {
         return lastActivityDTm;
     }
 
     public Activity getActivity() {
         return activity;
+    }
+
+    private void markError(String errTxt) {
+        this.info = errTxt;
+        this.isSuspicious = null;
+    }
+
+    public void markError(Exception exception) {
+        markError(exception.getMessage());
+    }
+
+    public boolean isError() {
+        return this.isSuspicious == null;
+    }
+
+    public void markSuspicious() {
+        this.isSuspicious = true;
     }
 
     public static DCCheckResult getDC() {
@@ -152,7 +197,8 @@ public class CheckResult implements CacheUnit, IDBType {
                 info,
                 acCode,
                 attributes,
-                weight.getId()
+                Optional.ofNullable(weight.getId()).orElse(null),
+                priority
         );
     }
 
@@ -195,7 +241,7 @@ public class CheckResult implements CacheUnit, IDBType {
 
         @Override
         public void load() throws SQLException {
-            final String sqlAll = "SELECT %s,%s,%s,%s,%s,%s,%s,%s,%s FROM " + TABLE_NAME +" WHERE ACTIVITY = 'A'";
+            final String sqlAll = "SELECT %s,%s,%s,%s,%s,%s,%s,%s,%s,%s FROM " + TABLE_NAME +" WHERE ACTIVITY = 'A'";
             try (Connection conn = getDbSource().getConnection();
                  PreparedStatement ps = conn.prepareStatement(String.format(sqlAll, (Object[]) FIELDS))) {
                 try (ResultSet rs = ps.executeQuery()) {
@@ -209,9 +255,10 @@ public class CheckResult implements CacheUnit, IDBType {
                                 rs.getString(4),                                // INFO
                                 rs.getString(5),                                // AC_CODE
                                 rs.getString(6),                                // ATTRIBUTES
-                                fw,
-                                rs.getDate(8),                                  // LAST_ACTIVITY_DT_TM
-                                Activity.valueOf(rs.getString(9))               // ACTIVITY
+                                fw,                                                        // WEIGHT
+                                fw.getPriority(),                                          // PRIORITY
+                                rs.getDate(9),                                  // LAST_ACTIVITY_DT_TM
+                                Activity.valueOf(rs.getString(10))               // ACTIVITY
                         );
                         addByKey(id, sc);
                     }

@@ -11,12 +11,15 @@ import service.HttpReply;
 import sys.FIParams;
 import sys.TransactionCheckingCenter;
 import sys.type.CheckResult;
+import sys.type.DeterminingFunction;
+import sys.type.DeterminingFunction.PostAction;
 import sys.type.TransportTransactionData;
 import utils.StringUtils;
 import utils.SysUtils;
 
 import javax.servlet.AsyncContext;
 import java.lang.invoke.MethodHandles;
+import java.time.Duration;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -38,7 +41,7 @@ public class PaymentLoader implements Runnable {
 
         log.info("Start no delay payments loader");
         while (LOADING.get()) {
-            final ConsumerRecords<String, TransportTransactionData> records = kafkaConsumerCli.poll();
+            final ConsumerRecords<String, TransportTransactionData> records = kafkaConsumerCli.poll(Duration.ofMillis(50));
             if (!records.isEmpty()) {
                 for (final ConsumerRecord<String, TransportTransactionData> record : records) {
                     if (LOADING.get()) {
@@ -47,7 +50,8 @@ public class PaymentLoader implements Runnable {
                         HttpReply reply;
                         try {
                             final CheckResult result = TransactionCheckingCenter.instance().checkTransaction(transport.getData(), id);
-                            reply = new HttpReply(true, StringUtils.booleanYNWrapper(result.isSuspicious()), result.getPostAction().getShortName(), result.getInfo());
+                            PostAction pA = result.getPostAction();
+                            reply = new HttpReply(true, StringUtils.booleanYNWrapper(result.isSuspicious()), pA == null ? "N/A" : pA.getShortName(), result.getInfo());
                         } catch (Exception se) {
                             log.error(se);
                             reply = new HttpReply(false, "N/A", "N/A", "Transaction handling error");

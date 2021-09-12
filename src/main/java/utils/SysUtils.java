@@ -64,7 +64,7 @@ public class SysUtils {
         return s;
     }
 
-    public static void write2stream(final OutputStream outputStream, final String text) throws IOException {
+    public static void write2Stream(final OutputStream outputStream, final String text) throws IOException {
         final CharsetEncoder encoder = getHttpEncodingCharset().newEncoder();
 
         final int fullLen = text.length();
@@ -159,9 +159,9 @@ public class SysUtils {
             actSb.append(", ns:");
             actSb.append(thConsumesNs);
             actSb.append(", ms:");
-            actSb.append(df.format((double) thConsumesNs / 1_000_000));
+            actSb.append(df.format((float) thConsumesNs / 1_000_000));
             actSb.append(", sec:");
-            actSb.append(df.format((double) thConsumesNs / 1_000_000_000));
+            actSb.append(df.format((float) thConsumesNs / 1_000_000_000));
             actSb.append("\n");
             topCnt++;
         }
@@ -184,9 +184,9 @@ public class SysUtils {
                 ttlSb.append(", ns:");
                 ttlSb.append(thConsumesNs);
                 ttlSb.append(", ms:");
-                ttlSb.append(df.format((double) thConsumesNs / 1_000_000));
+                ttlSb.append(df.format((float) thConsumesNs / 1_000_000));
                 ttlSb.append(", sec:");
-                ttlSb.append(df.format((double) thConsumesNs / 1_000_000_000));
+                ttlSb.append(df.format((float) thConsumesNs / 1_000_000_000));
                 ttlSb.append("\n");
                 topCnt++;
             }

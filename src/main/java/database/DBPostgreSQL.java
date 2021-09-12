@@ -30,13 +30,17 @@ public class DBPostgreSQL extends DBSource {
     @Override
     public void insert(IDBType type) {
         dbSrv.execute(() -> {
-            final String fields = String.join(",", type.getFields());
-            final String sql = String.format(INSERT, type.getTableName(), fields, type.getValuesString());
-            try (Connection conn = getConnection();
-                 PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.executeUpdate();
-            } catch (SQLException sqlEx) {
-                log.error("Insert type " + type.getClass().getName() + " error, sql: " + sql, sqlEx);
+            try {
+                final String fields = String.join(",", type.getFields());
+                final String sql = String.format(INSERT, type.getTableName(), fields, type.getValuesString());
+                try (Connection conn = getConnection();
+                     PreparedStatement ps = conn.prepareStatement(sql)) {
+                    ps.executeUpdate();
+                } catch (SQLException sqlEx) {
+                    log.error("Insert type " + type.getClass().getName() + " error, sql: " + sql, sqlEx);
+                }
+            } catch (Throwable th) {
+                log.error(th);
             }
         });
     }

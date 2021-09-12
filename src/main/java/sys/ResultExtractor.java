@@ -1,14 +1,12 @@
 package sys;
 
-import kafka.BootstrapStatLoader;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import sys.type.CheckResult;
-import sys.type.StatTransactionData;
-import sys.type.TimeMonitor;
+import sys.type.*;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.concurrent.*;
 
 public class ResultExtractor {
@@ -33,20 +31,18 @@ public class ResultExtractor {
 
     private static Future<CheckResult> getAsyncResult(final Long paymentId, final StatTransactionData data) {
         return RES_SRV.submit(() -> {
-            final CheckResult result = CheckResult.buildFtCheckResult(paymentId, data);
+            final CheckResult result = CheckResult.buildFtCheckResult(data);
             try {
-//                if (!result.isError()) {
-                    // calculate result
-                    calculateResult(data, result);
-                    log.info("Apply transaction with id:" + paymentId + " to statistics");
-                    Iterator<TimeMonitor> tmIt = TimeMonitor.getIterator();
-                    while (tmIt.hasNext()) {
-                        TimeMonitor tm = tmIt.next();
-                        tm.addToStatistics(data);
-                    }
-//                }
+                calculateResult(data, result);
+                data.setSuspicious(result.isSuspicious());
+                log.info("Applying transaction with id:" + paymentId + " to statistics");
+                Iterator<TimeMonitor> tmIt = TimeMonitor.getIterator();
+                while (tmIt.hasNext()) {
+                    TimeMonitor tm = tmIt.next();
+                    tm.addToStatistics(data);
+                }
             } catch (final Exception e) {
-//                result.markError(e);
+                result.markError(e);
             }
 
             return result;
@@ -54,44 +50,35 @@ public class ResultExtractor {
     }
 
     private static void calculateResult(final StatTransactionData data, final CheckResult result) throws Exception {
-//        long riskLevelSum = 0L;
-//        final Date checkDateTime = new Date();
-//        for (final FTFraudCheckCondition checkCondition : FraudCheckConditionHolder.getConditions()) {
-//            result.setCheckDateTime(checkDateTime);
-//            final FTRiskWeight riskWeight = checkCondition.getRiskWeight();
-//
-//            final boolean increaseRiskLevel = checkCondition.getConditionResult(data, result, riskLevelSum);
-//
-//            if (result.isError())
-//                break;
-//
-//            if (increaseRiskLevel) {
-//                riskLevelSum += riskWeight.getWeight();
-//
-//                if (DefaultPropertyCore.isEnableDevTrace) {
-//                    log.info("Add triggered condition id:" + checkCondition.id + " to check result id:" + result.id);
-//                }
-//            }
-//
-//            if (riskLevelReached(riskLevelSum, result)) {
-//                result.setRiskWeight(riskWeight);
-//                result.setActionType(checkCondition.action);
-//                break;
-//            }
-//        }
-//
-//        if (triggeredConditions.size() > 0) {
-//            result.setTriggeredConditions(triggeredConditions);
-//        }
-//        result.setTtlRiskWeight(riskLevelSum);
+        Long ttlWeight = 0L;
+        Iterator<DeterminingFunction> dfIt = DeterminingFunction.getIterator();
+        while (dfIt.hasNext()) {
+            final DeterminingFunction dFunc = dfIt.next();
+            final FunctionWeight fWeight = dFunc.getWeight();
+
+            final boolean increaseTtlWeight = dFunc.getResult(data, result, ttlWeight);
+
+            if (result.isError())
+                break;
+
+            if (increaseTtlWeight) {
+                ttlWeight += fWeight.getWeight();
+            }
+
+            if (riskLevelReached(ttlWeight, result)) {
+                result.setPostAction(Optional.ofNullable(dFunc.getPostAction()).orElse(DeterminingFunction.PostAction.APPROVE));
+                result.setWeight(fWeight);
+                break;
+            }
+        }
     }
 
-//    private static boolean riskLevelReached(long riskLevelSum, FTCheckResult result) {
-//        if (riskLevelSum >= DefaultPropertyFD.riskLevelLimit) {
-//            result.markFraud();
-//            return true;
-//        }
-//
-//        return riskLevelSum <= DefaultPropertyFD.lowerRiskLevelLimit;
-//    }
+    private static boolean riskLevelReached(long ttlWeight, CheckResult result) {
+        if (ttlWeight >= FIParams.TTL_WEIGHT_LIMIT) {
+            result.markSuspicious();
+            return true;
+        }
+
+        return ttlWeight <= FIParams.LOWER_TTL_WEIGHT_LIMIT;
+    }
 }

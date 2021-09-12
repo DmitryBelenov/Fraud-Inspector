@@ -36,9 +36,10 @@
   <filter>
     <filter-name>CORSFilter</filter-name>
     <filter-class>service.RestCORSFilter</filter-class>
+    <async-supported>true</async-supported>
   </filter>
   <filter-mapping>
     <filter-name>CORSFilter</filter-name>
-    <url-pattern>/*</url-pattern>
+    <url-pattern>/ws</url-pattern>
   </filter-mapping>
 </web-app>

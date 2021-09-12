@@ -58,7 +58,7 @@ public class StatisticsProcessor {
             amount = new BigDecimal(data.getValue(amtIdx));
 
             int dtIdx = BaseAttributes.getAttributeIdx(ServiceField.PmDtTm.name());
-            final String date = data.getValue(dtIdx);
+            final String date = dtIdx >= 0 ? data.getValue(dtIdx) : null;
 
             transactionDate = (StringUtils.isNullOrEmpty(date)) ? new Date() : DATE_FORMAT.parse(date);
         } catch (Exception e) {
@@ -85,7 +85,7 @@ public class StatisticsProcessor {
                     + ", f:"  + timeMonitor.getCollector().getFilter() +"] val: " + amount + " key: " + key + " new stats: " + ts);
 
             if (!increment && stat.isZeroStat()) {
-                log.trace("Statistics cleaning: " + ts + " was removed by key:[" + key + "] from monitor:" + monCode);
+                log.info("Statistics cleaning: " + ts + " was removed by key:[" + key + "] from monitor:" + monCode);
                 return null;
             }
             return stat;

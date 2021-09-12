@@ -70,6 +70,11 @@ public class DeterminingFunction implements CacheUnit, IDBType {
         this.activity = activity;
     }
 
+    public boolean getResult(StatTransactionData stData, CheckResult result, long ttlWeight) throws Exception {
+        result.setInfo(getInfo());
+        return true;
+    }
+
     public Long getId() {
         return id;
     }

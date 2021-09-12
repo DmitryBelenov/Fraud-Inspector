@@ -12,7 +12,8 @@ public class BaseAttributes {
             RequiredField.Amt.name(),
             RequiredField.Ccy.name(),
             RequiredField.Dbt_IBAN.name(),
-            RequiredField.Crd_IBAN.name()
+            RequiredField.Crd_IBAN.name(),
+            ServiceField.PmDtTm.name()
     };
 
     static {

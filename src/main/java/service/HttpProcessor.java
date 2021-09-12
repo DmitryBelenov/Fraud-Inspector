@@ -4,6 +4,7 @@ import attribute.RequiredField;
 import kafka.BootstrapStatLoader;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import sys.TransactionCheckingCenter;
 import sys.cache.AttributeHolder;
 import sys.type.StatTransactionData;
 import sys.type.TransportTransactionData;
@@ -57,7 +58,7 @@ public class HttpProcessor {
             final String[] attributes = AttributeHolder.getIndexedAttrValues(pmData, attrCode);
             TransportTransactionData tData = new TransportTransactionData(new StatTransactionData(attrCode, attributes), id);
 
-            // call check method
+            TransactionCheckingCenter.instance().putTransactionToKafka(String.valueOf(tData.getId()), tData);
         } catch (Exception e) {
             log.error("FI System check error", e);
             writeSyncReply(resp, new HttpReply(false, "N/A", "N/A", "FI System internal error: " + e.getMessage()));
@@ -69,7 +70,7 @@ public class HttpProcessor {
             final ServletResponse resp = ac.getResponse();
             final String replyText = JsonUtils.toJson(reply);
             try (final ServletOutputStream sOut = resp.getOutputStream()) {
-                SysUtils.write2stream(sOut, replyText);
+                SysUtils.write2Stream(sOut, replyText);
                 sOut.println();
                 sOut.flush();
                 log.info("Response sent to async context, id:" + id + ", txt:" + replyText);
@@ -84,7 +85,7 @@ public class HttpProcessor {
     public static void writeSyncReply(HttpServletResponse resp, HttpReply reply) {
         final String replyText = JsonUtils.toJson(reply);
         try (final ServletOutputStream sOut = resp.getOutputStream()) {
-            SysUtils.write2stream(sOut, replyText);
+            SysUtils.write2Stream(sOut, replyText);
             sOut.println();
             sOut.flush();
             log.info("Sync response sent, txt:" + replyText);

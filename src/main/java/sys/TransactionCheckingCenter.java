@@ -68,7 +68,7 @@ public class TransactionCheckingCenter {
     }
 
     private void produce(final String topic, final long transactionTime, final String key, final Serializable data) throws Exception {
-        log.debug("Producing message with id:" + key + " to kafka");
+        log.info("Producing message with id:" + key + " to kafka");
         lock.lock();
         try {
             producer.produce(topic, transactionTime, key, data);

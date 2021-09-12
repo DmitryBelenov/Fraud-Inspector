@@ -6,15 +6,20 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.apache.kafka.common.serialization.LongSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import sys.FIParams;
 import utils.UtilsSerialization;
 
 import java.io.Serializable;
+import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 public class KafkaProducerClient {
+    public static final Logger log = LogManager.getLogger(MethodHandles.lookup().lookupClass());
+
     private final Map<Class<?>, KafkaProducer<Object, Object>> producers = new HashMap<>();
     private final KafkaProducer<Object, Object> defProducer;
     public static KafkaProducerClient instance;
@@ -22,6 +27,7 @@ public class KafkaProducerClient {
     public static void setInstance() {
         if (instance == null) {
             instance = new KafkaProducerClient();
+            log.info("Kafka producer client instantiated");
         }
     }
 

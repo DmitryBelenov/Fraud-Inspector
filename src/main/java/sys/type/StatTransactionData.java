@@ -56,4 +56,8 @@ public class StatTransactionData implements Serializable, IRestore {
     public void setSuspicious(Boolean suspicious) {
         isSuspicious = suspicious;
     }
+
+    public AttributeComposition getAc() {
+        return ac;
+    }
 }
